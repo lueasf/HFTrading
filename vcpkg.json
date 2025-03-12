@@ -1,0 +1,15 @@
+{
+  "name" : "hft",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "aac8812f26c3d13ea42bc1baaffae273385911aa",
+  "dependencies" : [ {
+    "name" : "boost-asio",
+    "version>=" : "1.87.0"
+  }, {
+    "name" : "boost-beast",
+    "version>=" : "1.87.0"
+  }, {
+    "name" : "nlohmann-json",
+    "version>=" : "3.11.3#1"
+  } ]
+}
