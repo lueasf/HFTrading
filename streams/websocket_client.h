@@ -1,6 +1,3 @@
-#ifndef WEBSOCKET_CLIENT_H
-#define WEBSOCKET_CLIENT_H
-
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -46,5 +43,3 @@ private:
     beast::flat_buffer m_buffer;
     bool m_connected;
 };
-
-#endif // WEBSOCKET_CLIENT_H
