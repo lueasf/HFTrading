@@ -1,0 +1,39 @@
+# Fichiers de compilation et binaires C++
+*.o
+*.out
+*.exe
+*.so
+*.a
+
+# Répertoires de build C++
+build/
+bin/
+obj/
+
+# Fichiers de dépendances et logs C++
+*.d
+*.log
+
+# Fichiers Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.py,cover
+
+# Environnements virtuels Python
+venv/
+env/
+.venv/
+
+# Fichiers de configuration et IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Fichiers de données temporaires
+*.tmp
+*.bak
+
+main
