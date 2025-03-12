@@ -5,7 +5,6 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <memory>
-#include <functional>
 #include <boost/beast/ssl/ssl_stream.hpp>
 
 namespace beast = boost::beast;

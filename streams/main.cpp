@@ -1,6 +1,51 @@
 #include <iostream>
+#include "websocket_client.h"
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/signal_set.hpp>
+#include <boost/asio/ssl/context.hpp>
 
 int main() {
     using namespace std;
     cout << "Hello" << endl;
+
+    try {
+        // Create the required Boost ASIO io_context and SSL context
+        net::io_context ioc;
+        ssl::context ctx{ssl::context::tlsv12_client};
+
+        // Load the system root certificates
+        ctx.set_default_verify_paths();
+
+        // Create our WebSocket client
+        BinanceWebSocketClient client(ioc, ctx);
+
+        // Set up signal handling
+        net::signal_set signals(ioc, SIGINT, SIGTERM);
+        signals.async_wait([&](beast::error_code const &, int) {
+            std::cout << "\nReceived shutdown signal" << std::endl;
+            if (client.is_connected()) {
+                client.disconnect();
+            }
+            ioc.stop();
+        });
+
+        // Binance WebSocket URL components
+        std::string host = "stream.binance.com";
+        std::string port = "443";
+        std::string target = "/ws/btcusdt@trade";  // BTC/USDT trade stream
+
+        // Connect to Binance WebSocket
+        client.connect(host, port, target);
+
+        // Start reading messages
+        client.start_reading();
+
+        // Run the I/O service
+        std::cout << "Waiting for BTC/USDT trades... (Press Ctrl+C to exit)" << std::endl;
+        ioc.run();
+
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
 }

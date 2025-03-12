@@ -37,3 +37,4 @@ env/
 *.bak
 
 main
+cmake-build-debug

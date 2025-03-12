@@ -11,5 +11,11 @@
   }, {
     "name" : "nlohmann-json",
     "version>=" : "3.11.3#1"
+  }, {
+    "name" : "fmt",
+    "version>=" : "11.0.2#1"
+  }, {
+    "name" : "openssl",
+    "version>=" : "3.4.1"
   } ]
 }
