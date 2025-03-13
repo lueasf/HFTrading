@@ -30,12 +30,10 @@ int main() {
         });
 
         // Binance WebSocket URL components
-        std::string host = "stream.binance.com";
-        std::string port = "443";
         std::string target = "/ws/btcusdt@trade";  // BTC/USDT trade stream
 
         // Connect to Binance WebSocket
-        client.connect(host, port, target);
+        client.connect(target);
 
         // Start reading messages
         client.start_reading();

@@ -5,7 +5,7 @@
 #include <chrono>
 
 BinanceWebSocketClient::BinanceWebSocketClient(net::io_context &ioc, ssl::context &ctx)
-        : m_ioc(ioc), m_ctx(ctx), m_connected(false) {
+        : m_ioc(ioc), m_ctx(ctx), m_connected(false), host("stream.binance.com"), port("443") {
 }
 
 BinanceWebSocketClient::~BinanceWebSocketClient() {
@@ -14,7 +14,7 @@ BinanceWebSocketClient::~BinanceWebSocketClient() {
     }
 }
 
-void BinanceWebSocketClient::connect(const std::string &host, const std::string &port, const std::string &target) {
+void BinanceWebSocketClient::connect(const std::string &target) {
     // These objects perform our I/O
     tcp::resolver resolver{m_ioc};
 
@@ -23,17 +23,6 @@ void BinanceWebSocketClient::connect(const std::string &host, const std::string 
 
     // Look up the domain name
     auto const results = resolver.resolve(host, port);
-
-    // Make the connection on the IP address we get from a lookup
-    auto ep = net::connect(beast::get_lowest_layer(*m_ws), results);
-
-    // Set SNI Hostname (many hosts need this to handshake successfully)
-//    if (!SSL_set_tlsext_host_name(m_ws->next_layer().native_handle(), host.c_str())) {
-//        throw beast::system_error(
-//                beast::error_code(static_cast<int>(::ERR_get_error()),
-//                                  net::error::get_ssl_category()),
-//                "Failed to set SNI Hostname");
-//    }
 
     // Update the host_ string. This will provide the value of the
     // Host HTTP header during the WebSocket handshake.
@@ -110,7 +99,7 @@ void BinanceWebSocketClient::read_next() {
 void BinanceWebSocketClient::on_message(beast::flat_buffer &buffer) {
     try {
         std::string json_str(beast::buffers_to_string(buffer.data()));
-        auto j = json::parse(json_str);
+        const auto j = json::parse(json_str);
 
         // Process the trade data
         handle_trade_message(j);

@@ -21,7 +21,7 @@ public:
 
     ~BinanceWebSocketClient();
 
-    void connect(const std::string &host, const std::string &port, const std::string &target);
+    void connect(const std::string &target);
 
     void disconnect();
 
@@ -36,6 +36,8 @@ private:
 
     void read_next();
 
+    std::string host;
+    std::string port;
     net::io_context &m_ioc;
     ssl::context &m_ctx;
     std::unique_ptr<websocket::stream<beast::ssl_stream<tcp::socket>>> m_ws;
