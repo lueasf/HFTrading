@@ -26,6 +26,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential g++ gcc cmake ninja-build pkg-config curl zip unzip tar
+          # Verify installations
+          ninja --version
+          cmake --version
+          gcc --version
+          g++ --version
+          which ninja
 
       # Setup vcpkg
       - name: Clone vcpkg
@@ -55,13 +61,19 @@ jobs:
         run: |
           echo "CC=gcc" >> $GITHUB_ENV
           echo "CXX=g++" >> $GITHUB_ENV
-          echo "CMAKE_GENERATOR=Ninja" >> $GITHUB_ENV
-          echo "CMAKE_MAKE_PROGRAM=ninja" >> $GITHUB_ENV
+          # Find and set the Ninja path explicitly
+          NINJA_PATH=$(which ninja)
+          echo "CMAKE_MAKE_PROGRAM=$NINJA_PATH" >> $GITHUB_ENV
 
       # Configure CMake
       - name: Configure CMake
         run: |
-          cmake -B ${{ github.workspace }}/build -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          # Use explicit Ninja path
+          cmake -B ${{ github.workspace }}/build \
+          -G "Ninja" \
+          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+          -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake \
+          -DCMAKE_MAKE_PROGRAM=$(which ninja)
 
       # Build
       - name: Build
@@ -71,10 +83,10 @@ jobs:
       - name: Debug on failure
         if: failure()
         run: |
-          echo "==== Compiler versions ===="
-          gcc --version
-          g++ --version
-          ninja --version
+          echo "==== System Info ===="
+          echo "PATH: $PATH"
+          echo "==== Ninja Info ===="
+          which ninja || echo "Ninja not found in PATH"
           echo "==== Build Log Contents ===="
           cat ${{ github.workspace }}/build/vcpkg-manifest-install.log || echo "Log file not found"
           echo "==== CMakeError.log ===="
