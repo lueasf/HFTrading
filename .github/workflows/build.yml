@@ -21,8 +21,8 @@ jobs:
         with:
           submodules: recursive
 
-      # Install build tools
-      - name: Install build dependencies
+      # Install C++ compiler and build tools
+      - name: Install C++ compiler and build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential g++ gcc cmake ninja-build pkg-config curl zip unzip tar
@@ -50,6 +50,12 @@ jobs:
           key: vcpkg-ubuntu-${{ hashFiles('**/vcpkg.json', '**/vcpkg_manifest.json') }}
           restore-keys: vcpkg-ubuntu-
 
+      # Set environment variables for compiler detection
+      - name: Set compiler environment variables
+        run: |
+          echo "CC=gcc" >> $GITHUB_ENV
+          echo "CXX=g++" >> $GITHUB_ENV
+
       # Configure CMake
       - name: Configure CMake
         run: |
@@ -63,6 +69,9 @@ jobs:
       - name: Debug on failure
         if: failure()
         run: |
+          echo "==== Compiler versions ===="
+          gcc --version
+          g++ --version
           echo "==== Build Log Contents ===="
           cat ${{ github.workspace }}/build/vcpkg-manifest-install.log || echo "Log file not found"
           echo "==== CMakeError.log ===="
