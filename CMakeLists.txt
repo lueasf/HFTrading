@@ -7,6 +7,7 @@ find_package(Boost REQUIRED COMPONENTS beast asio)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(cnats CONFIG REQUIRED)
 
 enable_testing()
 set(BOOST_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})

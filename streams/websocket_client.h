@@ -7,6 +7,8 @@
 #include <memory>
 #include <boost/beast/ssl/ssl_stream.hpp>
 
+#include "metrics.h"
+
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace websocket = beast::websocket;
@@ -17,7 +19,7 @@ using json = nlohmann::json;
 
 class BinanceWebSocketClient {
 public:
-    BinanceWebSocketClient(net::io_context &ioc, ssl::context &ctx);
+    BinanceWebSocketClient(net::io_context &ioc, ssl::context &ctx, const Metrics &metrics);
 
     ~BinanceWebSocketClient();
 
@@ -36,6 +38,7 @@ private:
 
     void read_next();
 
+    Metrics m_metrics;
     std::string host;
     std::string port;
     net::io_context &m_ioc;

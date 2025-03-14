@@ -17,5 +17,8 @@
   }, {
     "name" : "openssl",
     "version>=" : "3.4.1"
+  }, {
+    "name" : "cnats",
+    "version>=" : "3.10.0"
   } ]
 }

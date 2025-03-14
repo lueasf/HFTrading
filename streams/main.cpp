@@ -1,5 +1,8 @@
+#define NATS_HAS_TLS
+
 #include <iostream>
 #include "websocket_client.h"
+#include "nats_client.h"
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/ssl/context.hpp>
@@ -7,6 +10,11 @@
 int main() {
     using namespace std;
     cout << "Hello" << endl;
+
+    NatsClient natsClient;
+    natsClient.connect();
+
+    Metrics metrics(natsClient);
 
     try {
         // Create the required Boost ASIO io_context and SSL context
@@ -17,7 +25,7 @@ int main() {
         ctx.set_default_verify_paths();
 
         // Create our WebSocket client
-        BinanceWebSocketClient client(ioc, ctx);
+        BinanceWebSocketClient client(ioc, ctx, metrics);
 
         // Set up signal handling
         net::signal_set signals(ioc, SIGINT, SIGTERM);
