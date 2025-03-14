@@ -64,7 +64,7 @@ jobs:
 
       # Upload artifact
       - name: Upload executable artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: streams_exec-ubuntu
           path: ${{ steps.find_exe.outputs.executable_path }}
