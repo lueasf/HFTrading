@@ -59,7 +59,7 @@ jobs:
       # Configure CMake
       - name: Configure CMake
         run: |
-          cmake -B ${{ github.workspace }}/build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          cmake -B ${{ github.workspace }}/build -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
 
       # Build
       - name: Build
@@ -72,6 +72,7 @@ jobs:
           echo "==== Compiler versions ===="
           gcc --version
           g++ --version
+          ninja --version
           echo "==== Build Log Contents ===="
           cat ${{ github.workspace }}/build/vcpkg-manifest-install.log || echo "Log file not found"
           echo "==== CMakeError.log ===="
