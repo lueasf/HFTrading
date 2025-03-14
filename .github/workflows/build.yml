@@ -16,9 +16,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      # Install build tools
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build
 
       # Setup vcpkg
       - name: Clone vcpkg
@@ -46,11 +53,22 @@ jobs:
       # Configure CMake
       - name: Configure CMake
         run: |
-          cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          cmake -B ${{ github.workspace }}/build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
 
       # Build
       - name: Build
         run: cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }} --target streams_exec
+
+      # Debug build issues if they occur
+      - name: Debug on failure
+        if: failure()
+        run: |
+          echo "==== Build Log Contents ===="
+          cat ${{ github.workspace }}/build/vcpkg-manifest-install.log || echo "Log file not found"
+          echo "==== CMakeError.log ===="
+          cat ${{ github.workspace }}/build/CMakeFiles/CMakeError.log || echo "Log file not found"
+          echo "==== CMakeOutput.log ===="
+          cat ${{ github.workspace }}/build/CMakeFiles/CMakeOutput.log || echo "Log file not found"
 
       # Find executable path
       - name: Find executable path
@@ -59,7 +77,7 @@ jobs:
         run: |
           EXEC_PATH="${{ github.workspace }}/build/streams/streams_exec"
           echo "Execute check if file exists"
-          ls -la $(dirname "$EXEC_PATH")
+          ls -la $(dirname "$EXEC_PATH") || echo "Directory not found"
           echo "executable_path=$EXEC_PATH" >> $GITHUB_OUTPUT
 
       # Upload artifact
