@@ -21,94 +21,31 @@ jobs:
         with:
           submodules: recursive
 
-      # Install C++ compiler and build tools
-      - name: Install C++ compiler and build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential g++ gcc cmake ninja-build pkg-config curl zip unzip tar
-          # Verify installations
-          ninja --version
-          cmake --version
-          gcc --version
-          g++ --version
-          which ninja
-
-      # Setup vcpkg
-      - name: Clone vcpkg
-        uses: actions/checkout@v4
-        with:
-          repository: microsoft/vcpkg
-          path: vcpkg
+      - uses: lukka/get-cmake@latest
+      - name: List $RUNNER_WORKSPACE before vcpkg is setup
+        run: find $RUNNER_WORKSPACE
+        shell: bash
 
       - name: Setup vcpkg
-        shell: bash
-        run: |
-          cd $VCPKG_ROOT
-          ./bootstrap-vcpkg.sh -disableMetrics
-
-      # Cache vcpkg packages
-      - name: Cache vcpkg packages
-        uses: actions/cache@v3
+        uses: lukka/run-vcpkg@v11
+        id: runvcpkg
         with:
-          path: |
-            ${{ env.VCPKG_ROOT }}/installed
-            ${{ env.VCPKG_ROOT }}/packages
-          key: vcpkg-ubuntu-${{ hashFiles('**/vcpkg.json', '**/vcpkg_manifest.json') }}
-          restore-keys: vcpkg-ubuntu-
+          # This one is not needed, as it is the default value anyway.
+          # vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          vcpkgJsonGlob: '**/cmakepresets/vcpkg.json'
 
-      # Set environment variables for compiler detection
-      - name: Set compiler environment variables
-        run: |
-          echo "CC=gcc" >> $GITHUB_ENV
-          echo "CXX=g++" >> $GITHUB_ENV
-          # Find and set the Ninja path explicitly
-          NINJA_PATH=$(which ninja)
-          echo "CMAKE_MAKE_PROGRAM=$NINJA_PATH" >> $GITHUB_ENV
-
-      # Configure CMake
-      - name: Configure CMake
-        run: |
-          # Use explicit Ninja path
-          cmake -B ${{ github.workspace }}/build \
-          -G "Ninja" \
-          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
-          -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake \
-          -DCMAKE_MAKE_PROGRAM=$(which ninja)
-          -DCMAKE_CXX_COMPILER=${CXX}
-          -DCMAKE_C_COMPILER=${CC}
-
-      # Build
-      - name: Build
-        run: cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }} --target streams_exec
-
-      # Debug build issues if they occur
-      - name: Debug on failure
-        if: failure()
-        run: |
-          echo "==== System Info ===="
-          echo "PATH: $PATH"
-          echo "==== Ninja Info ===="
-          which ninja || echo "Ninja not found in PATH"
-          echo "==== Build Log Contents ===="
-          cat ${{ github.workspace }}/build/vcpkg-manifest-install.log || echo "Log file not found"
-          echo "==== CMakeError.log ===="
-          cat ${{ github.workspace }}/build/CMakeFiles/CMakeError.log || echo "Log file not found"
-          echo "==== CMakeOutput.log ===="
-          cat ${{ github.workspace }}/build/CMakeFiles/CMakeOutput.log || echo "Log file not found"
-
-      # Find executable path
-      - name: Find executable path
-        id: find_exe
+      - name: List $RUNNER_WORKSPACE before build
+        run: find $RUNNER_WORKSPACE
         shell: bash
-        run: |
-          EXEC_PATH="${{ github.workspace }}/build/streams/streams_exec"
-          echo "Execute check if file exists"
-          ls -la $(dirname "$EXEC_PATH") || echo "Directory not found"
-          echo "executable_path=$EXEC_PATH" >> $GITHUB_OUTPUT
-
-      # Upload artifact
-      - name: Upload executable artifact
-        uses: actions/upload-artifact@v4
+      - name: Prints output of run-vcpkg's action.
+        run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}' "
+      - name: Run CMake+vcpkg+Ninja
+        uses: lukka/run-cmake@v10
+        id: runcmake
         with:
-          name: streams_exec-ubuntu
-          path: ${{ steps.find_exe.outputs.executable_path }}
+          cmakeListsTxtPath: '${{ github.workspace }}/cmakepresets/CMakeLists.txt'
+          configurePreset: 'ninja-multi-vcpkg'
+          buildPreset: 'ninja-multi-vcpkg'
+      - name: List $RUNNER_WORKSPACE after build
+        run: find $RUNNER_WORKSPACE
+        shell: bash
