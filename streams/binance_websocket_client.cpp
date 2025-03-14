@@ -125,11 +125,14 @@ void BinanceWebSocketClient::handle_trade_message(const json &j) {
         std::string quantity = j["q"];
         bool is_buyer_maker = j["m"];
 
+        long long current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        long long latency = current_time - event_time;
+
         std::string buy_sell = is_buyer_maker ? "SELL" : "BUY";
 
         using namespace std::chrono;
-        fmt::print("[{}] BTC/USDT {} | Price: {} | Quantity: {} | Trade ID: {}\n",
-                   sys_seconds(seconds(event_time / 1000)), buy_sell, price, quantity, trade_id);
+        fmt::print("[{}] BTC/USDT {} | Price: {} | Quantity: {} | Latency: {} | Trade ID: {}\n",
+                   sys_seconds(seconds(event_time / 1000)), buy_sell, price, quantity, latency, trade_id);
     }
     catch (const std::exception &e) {
         std::cerr << "Error parsing trade data: " << e.what() << std::endl;
