@@ -9,6 +9,7 @@ async def start_nats(func):
         reply = msg.reply
         data = msg.data.decode()
 
+        # call exporter
         func(data)
 
         print("Received a message on '{subject} {reply}': {data}".format(

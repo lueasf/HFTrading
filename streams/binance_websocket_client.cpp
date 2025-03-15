@@ -30,7 +30,7 @@ void BinanceWebSocketClient::connect(const std::string& target)
     // Look up the domain name
     auto const results = resolver.resolve(host, port);
 
-    auto ep = net::connect(beast::get_lowest_layer(*m_ws), results);
+    net::connect(get_lowest_layer(*m_ws), results);
 
     // Update the host_ string. This will provide the value of the
     // Host HTTP header during the WebSocket handshake.

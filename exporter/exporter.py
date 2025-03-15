@@ -37,6 +37,8 @@ async def test():
 async def main():
     # Every minute at 0s, reset the buy and sell number
     resetCounterTask = asyncio.create_task(test())
+
+    # bond nats and exec_message
     natsTask = asyncio.create_task(nats_py.start_nats(exec_message))
 
     await resetCounterTask
@@ -46,5 +48,5 @@ if __name__ == '__main__':
     # Start up the server to expose the metrics.
     start_http_server(8000)
 
-    asyncio.run(main())
+    asyncio.run(main()) # run NATS and HTTP server
 
