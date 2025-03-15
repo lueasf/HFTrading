@@ -6,6 +6,7 @@
 #include <iostream>
 #include <chrono>
 
+// connect to the Binance WebSocket API, receive trade data, and process orders.
 BinanceWebSocketClient::BinanceWebSocketClient(net::io_context& ioc, ssl::context& ctx, const Metrics &metrics)
     : m_metrics(metrics), m_ioc(ioc), m_ctx(ctx), m_connected(false), host("stream.binance.com"), port("443")
 {

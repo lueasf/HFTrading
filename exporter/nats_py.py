@@ -1,6 +1,7 @@
 import asyncio
 import nats
 
+# Connect to NATS and listen for messages. When a message is received, call func
 async def start_nats(func):
     nc = await nats.connect("localhost")
 
@@ -15,7 +16,8 @@ async def start_nats(func):
         print("Received a message on '{subject} {reply}': {data}".format(
             subject=subject, reply=reply, data=data))
 
-    # Simple publisher and async subscriber via coroutine.
+    # subscribe to subject and exec message_handler which call func which 
+    # call exec_message from exporter.py
     sub = await nc.subscribe("foo", cb=message_handler)
 
     # just wait

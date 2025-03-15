@@ -1,5 +1,7 @@
 #include "metrics.h"
 
+
+// handle trade events and send them to NATS
 Metrics::Metrics(NatsClient& nats_client): m_nats_client(nats_client)
 {
 }

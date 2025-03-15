@@ -1,9 +1,11 @@
-from prometheus_client import start_http_server, Summary, Gauge
+from prometheus_client import start_http_server, Gauge
 import random
 import time
 import asyncio
 import schedule
 import nats_py
+
+# collect data, connect to nats (with nats.py) and expose it to prometheus
 
 # Create a metric to track time spent and requests made.
 REQUEST_TIME = Gauge('request_processing_seconds', 'Time spent processing request')

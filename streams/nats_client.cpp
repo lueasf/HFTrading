@@ -1,5 +1,7 @@
 #include "nats_client.h"
 
+// https://github.com/nats-io/nats.c
+// connect to nats and publish trade events.
 NatsClient::NatsClient()
 {
     m_nc = NULL;
