@@ -30,6 +30,7 @@ jobs:
         with:
           repository: microsoft/vcpkg
           path: vcpkg
+          ref: aac8812f26c3d13ea42bc1baaffae273385911aa
 
       - name: Setup vcpkg
         run: |
