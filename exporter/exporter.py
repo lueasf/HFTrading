@@ -10,9 +10,9 @@ import nats_py
 # collect data, connect to nats (with nats.py) and expose it to prometheus
 
 # Create a metric to track time spent and requests made.
-BUY_NUMBER = Gauge('buy_number', 'Buy number', ['symbol'])
-SELL_NUMBER = Gauge('sell_number', 'Sell number', ['symbol'])
-LATENCY = Gauge('latency', 'Latency', ['symbol'])
+BUY_NUMBER = Gauge('hft_buy_number', 'Buy number', ['symbol'])
+SELL_NUMBER = Gauge('hft_sell_number', 'Sell number', ['symbol'])
+LATENCY = Gauge('hft_latency', 'Latency', ['symbol'])
 
 latency_sum = defaultdict(int)
 latency_count = defaultdict(int)
