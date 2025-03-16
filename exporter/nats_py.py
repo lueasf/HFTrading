@@ -11,14 +11,13 @@ async def start_nats(func):
         data = msg.data.decode()
 
         # call exporter
-        func(data)
-
-        print("Received a message on '{subject} {reply}': {data}".format(
-            subject=subject, reply=reply, data=data))
+        func(subject, data)
 
     # subscribe to subject and exec message_handler which call func which 
     # call exec_message from exporter.py
-    sub = await nc.subscribe("foo", cb=message_handler)
+    subjects = ["orders", "latency"]
+    for subject in subjects:
+        await nc.subscribe(subject, cb=message_handler)
 
     # just wait
 

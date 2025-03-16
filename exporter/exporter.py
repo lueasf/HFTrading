@@ -1,35 +1,75 @@
-from prometheus_client import start_http_server, Gauge
-import random
-import time
 import asyncio
+import string
+from collections import defaultdict
+
 import schedule
+from prometheus_client import start_http_server, Gauge
+
 import nats_py
 
 # collect data, connect to nats (with nats.py) and expose it to prometheus
 
 # Create a metric to track time spent and requests made.
-REQUEST_TIME = Gauge('request_processing_seconds', 'Time spent processing request')
-BUY_NUMBER = Gauge('buy_number', 'Buy number')
-SELL_NUMBER = Gauge('sell_number', 'Sell number')
+BUY_NUMBER = Gauge('buy_number', 'Buy number', ['symbol'])
+SELL_NUMBER = Gauge('sell_number', 'Sell number', ['symbol'])
+LATENCY = Gauge('latency', 'Latency', ['symbol'])
 
-def add_order(type: str):
+latency_sum = defaultdict(int)
+latency_count = defaultdict(int)
+
+
+def add_order(type: str, labels: dict):
     if type == 'BUY':
-        BUY_NUMBER.inc()
+        BUY_NUMBER.labels(labels['symbol']).inc()
     elif type == 'SELL':
-        SELL_NUMBER.inc()
+        SELL_NUMBER.labels(labels['symbol']).inc()
 
 
-def exec_message(data):
+def add_latency(value: string, labels: dict):
+    global latency_sum, latency_count
+    latency_sum[labels["symbol"]] += int(value)
+    latency_count[labels["symbol"]] += 1
+
+
+def update_latency():
+    global latency_sum, latency_count
+
+    for symbol in latency_sum.keys():
+        if latency_count[symbol] == 0:
+            continue
+        LATENCY.labels(symbol).set(latency_sum[symbol] / latency_count[symbol])
+        latency_sum[symbol] = 0
+        latency_count[symbol] = 0
+
+
+def deserialize(data):
+    value = data.split("\n")[0]
+    labels_str = data.split("\n")[1]
+    labels = {}
+    for label in labels_str.split(","):
+        if label:
+            k, v = label.split("=")
+            labels[k] = v.strip("\"")
+    return value, labels
+
+
+def exec_message(subject, data):
     # we'll see when there are other types of messages
-    add_order(data)
+    data_deserialized = deserialize(data)
+    if subject == "orders":
+        add_order(data_deserialized[0], data_deserialized[1])
+    elif subject == "latency":
+        add_latency(data_deserialized[0], data_deserialized[1])
 
 
 def reset_order():
-    BUY_NUMBER.set(0)
-    SELL_NUMBER.set(0)
+    BUY_NUMBER.clear()
+    SELL_NUMBER.clear()
 
 
 async def test():
+    schedule.every(15).seconds.do(update_latency)
+
     schedule.every().minute.at(":00").do(reset_order)
     while True:
         schedule.run_pending()
@@ -46,9 +86,9 @@ async def main():
     await resetCounterTask
     await natsTask
 
+
 if __name__ == '__main__':
     # Start up the server to expose the metrics.
     start_http_server(8000)
 
-    asyncio.run(main()) # run NATS and HTTP server
-
+    asyncio.run(main())  # run NATS and HTTP server

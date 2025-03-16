@@ -161,17 +161,19 @@ void BinanceWebSocketClient::handle_trade_message(const json& j)
 
         // UTC timezone using zoned_time
         long long current_time = get_time_utc();
-        long long latency = current_time - event_time;
+        long long latency = current_time - event_time; // processing latency
+        long long trade_latency = event_time - trade_time; // trade latency
 
         std::string buy_sell = is_buyer_maker ? "SELL" : "BUY";
 
         if (buy_sell == "BUY")
         {
-            m_metrics.send_order(BUY);
+            m_metrics.send_order(symbol, BUY);
         } else
         {
-            m_metrics.send_order(SELL);
+            m_metrics.send_order(symbol, SELL);
         }
+        m_metrics.send_latency(symbol, latency);
 
         using namespace std::chrono;
         fmt::print("[{}] BTC/USDT {} | Price: {} | Quantity: {} | Latency: {} | Trade ID: {}\n",

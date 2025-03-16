@@ -20,5 +20,8 @@
   }, {
     "name" : "cnats",
     "version>=" : "3.10.0"
+  }, {
+    "name" : "boost-test",
+    "version>=" : "1.87.0"
   } ]
 }

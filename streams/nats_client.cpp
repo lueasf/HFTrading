@@ -32,3 +32,9 @@ void NatsClient::publish(std::string value) const
 {
     natsConnection_PublishString(m_nc, "foo", value.c_str());
 }
+
+void NatsClient::publish(const metric_message &message) const {
+
+    natsConnection_PublishString(m_nc, message.name.c_str(), to_nats_message(message).c_str());
+}
+
