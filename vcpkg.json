@@ -20,5 +20,8 @@
   }, {
     "name" : "cnats",
     "version>=" : "3.10.0"
+  }, {
+    "name" : "yaml-cpp",
+    "version>=" : "0.8.0#2"
   } ]
 }

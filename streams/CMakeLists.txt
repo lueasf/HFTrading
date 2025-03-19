@@ -13,7 +13,9 @@ add_library(streams_lib
         nats_client.cpp
         nats_client.h
         metrics.cpp
-        metrics.h)
+        metrics.h
+        config.cpp
+)
 
 target_include_directories(streams_lib PUBLIC ${BOOST_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -24,8 +26,10 @@ target_link_libraries(streams_lib PRIVATE Boost::asio
         OpenSSL::SSL
         OpenSSL::Crypto
         cnats::nats_static
+        yaml-cpp::yaml-cpp
         GTest::gtest_main
-        GTest::gtest)
+        GTest::gtest
+)
 
 add_executable(streams_exec main.cpp)
 target_link_libraries(streams_exec PRIVATE streams_lib)
