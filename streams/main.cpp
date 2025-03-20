@@ -1,5 +1,6 @@
 #define NATS_HAS_TLS
 
+#include <config.h>
 #include <iostream>
 #include "websocket_client.h"
 #include "nats_client.h"
@@ -10,6 +11,8 @@
 int main() {
     using namespace std;
     cout << "Hello" << endl;
+
+    load();
 
     NatsClient natsClient;
     natsClient.connect();
