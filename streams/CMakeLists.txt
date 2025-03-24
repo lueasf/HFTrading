@@ -15,6 +15,7 @@ add_library(streams_lib
         metrics.cpp
         metrics.h
         config.cpp
+        config.h
 )
 
 target_include_directories(streams_lib PUBLIC ${BOOST_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})

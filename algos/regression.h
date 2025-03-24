@@ -21,11 +21,11 @@ public:
 
     double predict(double x) const;
 
-    double Regression::getSlope() const;
+    double getSlope() const;
 
-    double Regression::getIntercept() const;
+    double getIntercept() const;
 
-    void Regression::setMaxDataPoints(size_t max);
+    void setMaxDataPoints(size_t max);
 
     void clear();
 };
