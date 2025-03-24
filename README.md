@@ -1,4 +1,6 @@
-# hft
+# HFTrading
+
+HFTrading is a group project about creating a High Frequency Trading Tool in C++ & Python.
 
 ## How to run
 
