@@ -140,17 +140,14 @@ long long get_time_utc()
     return ms;
 }
 
+
 // https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams#trade-streams
 void BinanceWebSocketClient::handle_trade_message(const json& j)
 {
-    if (!j.contains("e") || j["e"] != "trade")
-    {
-        // Not a trade message or unexpected format
-        return;
-    }
+    if (!j.contains("e") || j["e"] != "trade") return;
 
-    try
-    {
+    try {
+
         std::string symbol = j["s"];
         long long event_time = j["E"]; // the time Binance generates and sends the event
         long long trade_time = j["T"]; // the time the trade occurred on Binance, usually equal or 1ms lower

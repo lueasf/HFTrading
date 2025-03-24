@@ -8,18 +8,21 @@
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/ssl/context.hpp>
 
-int main() {
+int main()
+{
     using namespace std;
     cout << "Hello" << endl;
 
-    load();
+    Config cfg = load();
+    cout << cfg << endl;
 
     NatsClient natsClient;
     natsClient.connect();
 
     Metrics metrics(natsClient);
 
-    try {
+    try
+    {
         // Create the required Boost ASIO io_context and SSL context
         net::io_context ioc;
         ssl::context ctx{ssl::context::tlsv12_client};
@@ -32,16 +35,18 @@ int main() {
 
         // Set up signal handling
         net::signal_set signals(ioc, SIGINT, SIGTERM);
-        signals.async_wait([&](beast::error_code const &, int) {
+        signals.async_wait([&](beast::error_code const&, int)
+        {
             std::cout << "\nReceived shutdown signal" << std::endl;
-            if (client.is_connected()) {
+            if (client.is_connected())
+            {
                 client.disconnect();
             }
             ioc.stop();
         });
 
         // Binance WebSocket URL components
-        std::string target = "/ws/btcusdt@trade";  // BTC/USDT trade stream
+        std::string target = "/ws/" + cfg.symbol + "@trade";
 
         // Connect to Binance WebSocket
         client.connect(target);
@@ -50,10 +55,11 @@ int main() {
         client.start_reading();
 
         // Run the I/O service
-        std::cout << "Waiting for BTC/USDT trades... (Press Ctrl+C to exit)" << std::endl;
+        std::cout << "Waiting for " << cfg.symbol << " trades... (Press Ctrl+C to exit)" << std::endl;
         ioc.run();
-
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception& e)
+    {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }

@@ -1,8 +1,35 @@
 #include "config.h"
-#include <iostream>
 #include <yaml-cpp/yaml.h>
 
-void load(const std::string &config_file) {
+Config load(const std::string& config_file)
+{
     YAML::Node config = YAML::LoadFile(config_file);
-    std::cout << config["nats"]["url"] << std::endl;
+
+    // NATS
+    std::string nats_url = config["nats"]["url"].as<std::string>();
+
+    // EXCHANGES
+    bool binance = config["exchanges"]["binance"].as<bool>();
+
+    // SYMBOL
+    std::string symbol = config["symbol"].as<std::string>();
+
+    Config cfg;
+    cfg.nats_url = nats_url;
+    cfg.exchanges = {{"binance", binance}};
+    cfg.symbol = symbol;
+
+    return cfg;
+}
+
+std::ostream& operator<<(std::ostream& os, const Config& config)
+{
+    os << "NATS URL: " << config.nats_url << std::endl;
+    os << "Exchanges: " << std::endl;
+    for (const auto& exchange : config.exchanges)
+    {
+        os << "  " << exchange.first << ": " << exchange.second << std::endl;
+    }
+    os << "Symbol: " << config.symbol << std::endl;
+    return os;
 }

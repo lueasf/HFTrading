@@ -26,4 +26,6 @@ https://github.com/nats-io/nats.c
 > Polars a data manipulation lib
 https://github.com/pola-rs/polars
 
+> Aeron for UDP transport
+https://github.com/aeron-io/aeron
 

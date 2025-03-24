@@ -16,4 +16,6 @@ set(BOOST_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
 set(BOOST_LIBRARIES ${Boost_LIBRARIES})
 
 
+add_subdirectory(communication)
 add_subdirectory(streams)
+add_subdirectory(algos)

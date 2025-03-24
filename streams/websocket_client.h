@@ -47,3 +47,4 @@ private:
     beast::flat_buffer m_buffer;
     bool m_connected;
 };
+

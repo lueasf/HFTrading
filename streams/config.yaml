@@ -1,2 +1,7 @@
 nats:
   url: nats://localhost:4222
+
+exchanges:
+  binance: true
+
+symbol: xrpusdt
