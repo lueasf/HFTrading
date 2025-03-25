@@ -24,7 +24,7 @@ int NatsClient::connect() {
     return 0;
 }
 
-void NatsClient::publish(std::string value) const {
+void NatsClient::publish_raw(std::string value) const {
     natsConnection_PublishString(m_nc, "foo", value.c_str());
 }
 

@@ -6,7 +6,7 @@
 struct Config
 {
     std::string nats_url;
-    std::pmr::unordered_map<std::string, bool> exchanges;
+    std::unordered_map<std::string, bool> exchanges;
     std::string symbol;
 };
 
