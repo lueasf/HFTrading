@@ -21,6 +21,8 @@ target_link_libraries(algos_lib PRIVATE Boost::asio
         yaml-cpp::yaml-cpp
         GTest::gtest_main
         GTest::gtest
+
+        communication_lib
 )
 
 add_executable(algos_exec main.cpp)

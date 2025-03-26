@@ -7,13 +7,33 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/ssl/context.hpp>
+#include <argparse/argparse.hpp>
 
-int main()
+int main(int argc, char* argv[])
 {
     using namespace std;
     cout << "Hello" << endl;
 
-    Config cfg = load();
+    argparse::ArgumentParser program("hft_streams");
+
+    program.add_argument("--config")
+           .help("Path to the configuration file")
+           .default_value("config.yaml");
+
+    try
+    {
+        program.parse_args(argc, argv);
+    }
+    catch (const std::runtime_error& err)
+    {
+        std::cout << err.what() << std::endl;
+        std::cout << program;
+        exit(0);
+    }
+
+    auto configFile = program.get<string>("config");
+
+    Config cfg = load(configFile);
     cout << cfg << endl;
 
     NatsClient natsClient;

@@ -11,6 +11,7 @@ find_package(fmt CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(cnats CONFIG REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
+find_package(argparse CONFIG REQUIRED)
 
 set(BOOST_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
 set(BOOST_LIBRARIES ${Boost_LIBRARIES})

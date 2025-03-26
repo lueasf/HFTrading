@@ -23,5 +23,8 @@
   }, {
     "name" : "yaml-cpp",
     "version>=" : "0.8.0#2"
+  }, {
+    "name" : "argparse",
+    "version>=" : "3.2"
   } ]
 }

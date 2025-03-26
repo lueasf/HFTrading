@@ -30,10 +30,12 @@ target_link_libraries(streams_lib PRIVATE Boost::asio
         yaml-cpp::yaml-cpp
         GTest::gtest_main
         GTest::gtest
+
+        communication_lib
 )
 
 add_executable(streams_exec main.cpp)
-target_link_libraries(streams_exec PRIVATE streams_lib)
+target_link_libraries(streams_exec PRIVATE argparse::argparse streams_lib)
 
 add_executable(streams_test tests/main_test.cpp tests/metrics_test.cpp tests/nats_client_test.cpp tests/config_test.cpp)
 target_link_libraries(streams_test PRIVATE streams_lib GTest::gtest_main GTest::gtest GTest::gmock GTest::gmock_main)
