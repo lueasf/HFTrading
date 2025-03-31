@@ -4,6 +4,11 @@ HFTrading is a group project about creating a High Frequency Trading Tool in C++
 
 ## How to install
 
+Build aeron first:
+```bash
+cmake --build cmake-build-debug --target aeron
+```
+
 On **Windows**, you will need to install Visual Studio. You need a single version of Visual Studio installed or the aeron
 build will fail.
 
