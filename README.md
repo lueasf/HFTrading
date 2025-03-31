@@ -2,6 +2,17 @@
 
 HFTrading is a group project about creating a High Frequency Trading Tool in C++ & Python.
 
+## How to install
+
+On **Windows**, you will need to install Visual Studio. You need a single version of Visual Studio installed or the aeron
+build will fail.
+
+You can check your current installation paths with:
+
+```powershell
+&(Join-Path ${env:ProgramFiles(x86)} "\Microsoft Visual Studio\Installer\vswhere.exe") -property installationpath
+```
+
 ## How to run
 
 ### Run the Nats server
@@ -9,7 +20,6 @@ HFTrading is a group project about creating a High Frequency Trading Tool in C++
 ```bash
 docker run -p 4222:4222 -ti nats:latest
 ```
-
 
 ## Resources
 
