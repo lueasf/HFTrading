@@ -2,7 +2,6 @@
 
 ## Reporters
 ### Risk
-
 - **VaR** : Value at Risk is a statistical measure that estimates the maximum potential loss a portfolio could face over a specified time period at a given confidence level.
 The confidence level is typically set at 95%, meaning that there is a 5% chance that the actual loss will exceed the VaR estimate.
 VaR = μ - z * σ
@@ -28,6 +27,6 @@ outperforms the VaR threshold.
 - **Sharpe Ratio** : Measures the return compared to the risk.
 If SR > 1, the strategy is good.
 
-### Performance 
+### Performance (Measure gain)
 - **Cumulative Return** : shows how much the portfolio has grown over time.
 - **Win Rate** : the percentage of trades that were profitable.
