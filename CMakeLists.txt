@@ -50,6 +50,13 @@ include_directories(${AERON_SOURCE_DIR}/aeron-driver/src/main/c)
 ##########################################
 # platform specific flags
 
+# all UNIX-based platform compiler flags
+if (UNIX)
+    add_compile_options(-Wall -Wpedantic -Wextra -Wno-unused-parameter)
+    #    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast -DDISABLE_BOUNDS_CHECKS")
+    add_compile_options($<$<CONFIG:Release>:-Ofast>)
+endif ()
+
 if (APPLE)
     add_compile_options(-Wsign-compare)
     add_definitions(-DDarwin)
