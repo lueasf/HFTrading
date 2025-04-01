@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import List, Iterator, Any, Dict
 
 import clickhouse_connect
+import csv
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -138,17 +139,18 @@ class OKXAPIDataSource(DataSource):
             if filename.endswith(".csv"):
                 csv_file += filename
                 break
-        with open(csv_file, 'r') as file:
-            for line in file:
-                columns = line.strip().split(',')
+        with open(csv_file, 'r', encoding='gbk') as file:
+            csv_reader = csv.reader(file)
+            next(csv_reader)
+            for row in csv_reader:
                 yield {
-                    "trade_id": float(columns[0]),
-                    "is_buyer_maker": columns[1] == 'buy',
-                    "volume": float(columns[2]),
-                    "price": float(columns[3]),
-                    "timestamp": float(columns[4]),
+                    "trade_id": float(row[0]),
+                    "is_buyer_maker": row[1].lower() == 'buy',
+                    "volume": float(row[2]),
+                    "price": float(row[3]),
+                    "timestamp": float(row[4]),
                     "exchange": self.exchange,
-                    "symbol": self.symbol
+                    "symbol": self.symbol,
                 }
 
     def get_symbols(self) -> List[str]:
