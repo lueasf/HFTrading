@@ -38,3 +38,5 @@ env/
 
 main
 cmake-build-debug
+
+backtest/.data

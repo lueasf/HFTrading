@@ -34,7 +34,7 @@ class BacktestEngine:
         self.exchanges[exchange.name] = exchange
         logger.debug("Exchange added: %s", exchange.name)
 
-    def add_data_feed(self, data_feed):
+    def add_data_feed(self, data_feed: DataFeed):
         self.data_feeds.append(data_feed)
         logger.debug("Data feed added: %s", data_feed)
 
