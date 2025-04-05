@@ -62,7 +62,7 @@ jobs:
         id: find_exe
         shell: bash
         run: |
-          EXEC_PATH="${{ github.workspace }}/build/streams/streams_exec"
+          EXEC_PATH="${{ github.workspace }}/build/binaries/streams_exec"
           echo "Execute check if file exists"
           ls -la $(dirname "$EXEC_PATH") || echo "Directory not found"
           echo "executable_path=$EXEC_PATH" >> $GITHUB_OUTPUT
