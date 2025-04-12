@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Self
 
-from backtest.data.data_source import ClickHouseDataSource, DataSource
+from backtest.data.data_source import DataSource, ExchangeData
 
 
 class DataFeed(ABC):
@@ -9,10 +9,12 @@ class DataFeed(ABC):
     def fetch_data(self, data_source: DataSource):
         pass
 
-    def initialize(self, start_time: float, end_time: float):
+    @abstractmethod
+    def initialize(self, start_time: float, end_time: float) -> Self:
         pass
 
-    def get_events(self) -> list[tuple[float, Any]]:
+    @abstractmethod
+    def get_events(self) -> list[Any]:
         pass
 
 
@@ -23,10 +25,14 @@ class ExchangeDataFeed(DataFeed):
         self.end_time = end_time
         self.data = None
 
-    def fetch_data(self, click_house_data_source: ClickHouseDataSource):
-        self.data = click_house_data_source.get_data(
+    def initialize(self, start_time: float, end_time: float) -> Self:
+        pass
+
+    def fetch_data(self, data_source: DataSource) -> Self:
+        self.data = data_source.get_data(
             start_time=self.start_time, end_time=self.end_time
         )
+        return self
 
-    def get_events(self) -> list[dict[float, Any]]:
-        return self.data
+    def get_events(self) -> list[ExchangeData]:
+        return list(self.data)

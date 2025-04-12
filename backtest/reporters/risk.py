@@ -51,3 +51,15 @@ class RiskMetrics:
             raise ValueError("Returns array is empty.")
         excess_returns = self.returns - risk_free_rate
         return np.mean(excess_returns) / np.std(self.returns)
+
+if __name__ == "__main__":
+    sample_returns = np.random.normal(0, 0.02, 1000)  # Génération de rendements fictifs
+    sample_prices = np.cumsum(sample_returns) + 100  # Prix simulés
+
+    risk = RiskMetrics(sample_returns, sample_prices)
+    print(f"VaR 95%: {risk.value_at_risk():.4f}")
+    print(f"CVaR 95%: {risk.conditional_value_at_risk():.4f}")
+    print(f"Sharpe Ratio: {risk.sharpe_ratio():.4f}")
+    print(f"Analyse de la VaR: {interpret_value_at_risk(risk.value_at_risk())}")
+    print(f"Analyse de la CVaR: {interpret_conditional_value_at_risk(risk.conditional_value_at_risk())}")
+    print(f"Analyse du Sharpe Ratio: {interpret_sharpe_ratio(risk.sharpe_ratio())}")

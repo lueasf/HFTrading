@@ -27,6 +27,20 @@ outperforms the VaR threshold.
 - **Sharpe Ratio** : Measures the return compared to the risk.
 If SR > 1, the strategy is good.
 
+
 ### Performance (Measure gain)
 - **Cumulative Return** : shows how much the portfolio has grown over time.
 - **Win Rate** : the percentage of trades that were profitable.
+
+
+## Strategies
+### Market Making Strategy
+Marketing Making is a high-frequency trading strategy that aims to profit from the bid-ask 
+spread by placing buy and sell orders at the same time. The ask, being the lowest price a seller is willing to accept,
+and the bid, being the highest price a buyer is willing to pay.
+Market making is a strategy that provides liquidity to the market.
+
+### Static Arbitrage
+Static Arbitrage is a trading strategy that aims to profit from the price difference between two
+or more markets. We buy the asset in the market where it is undervalued and sell it
+in the market where it is overvalued.

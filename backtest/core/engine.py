@@ -1,12 +1,14 @@
 import logging
 from typing import Dict, Any, List
 
+from backtest.data.data_source import ExchangeData
 from backtest.data.feed import DataFeed
 from backtest.exchange.exchange import Exchange
+from backtest.exchange.orderbook import Order
 
 from backtest.reporters.performance import PerformanceMetrics, interpret_win_rate, interpret_cumulative_returns
-from backtest.reporters.risk import RiskMetrics, interpret_value_at_risk, interpret_conditional_value_at_risk, interpret_sharpe_ratio
-
+from backtest.reporters.risk import RiskMetrics, interpret_value_at_risk, interpret_conditional_value_at_risk, \
+    interpret_sharpe_ratio
 
 logger = logging.getLogger(__name__)
 
@@ -45,39 +47,59 @@ class BacktestEngine:
 
         # Initialize events and timestamps
         for data_feed in self.data_feeds:
-            for timestamp, event in data_feed.get_events():
-                self.events[timestamp] = event
-                self.timestamps.append(timestamp)
+            logger.debug("Fetching events from data feed: %s", data_feed)
+            exchange_data: ExchangeData
+            for exchange_data in data_feed.get_events():
+                self.events[exchange_data.timestamp] = exchange_data
+                self.timestamps.append(exchange_data.timestamp)
+            logger.debug("Events fetched: %s", len(self.events))
 
+        # TODO: list might be too big, should go for set directly
         self.timestamps = list(set(self.timestamps))
         self.timestamps.sort()
 
     def process_next_event(self):
         if self.current_time in self.events:
             event = self.events[self.current_time]
-            exchange = self.exchanges.get(event["exchange"])
-            if exchange:
-                trade = exchange.submit_order(event["order"])
+            if isinstance(event, ExchangeData):
+                data: ExchangeData = event
+                exchange = self.exchanges.get(data.exchange)
 
-                if trade:
-                    self.returns.append(trade["return"])
-                    self.pnl.append(trade["pnl"])
-                    self.trades.append(trade)
+                if exchange:
+                    exchange.submit_order(Order.from_exchangedata(data))
+                else:
+                    logger.error("Exchange not found for event: %s", event)
+
+                # trades come later from strategy
+                #if trade:
+                #    self.returns.append(trade["return"])
+                #    self.pnl.append(trade["pnl"])
+                #    self.trades.append(trade)
             else:
-                logger.error("Exchange not found for event: %s", event)
+                logger.error("Unknown event type: %s", type(event))
         else:
             self.current_time = self.timestamps.pop(0) if self.timestamps else None
 
     def run(self):
+        logger.info("Initializing backtest engine")
+        self.initialize()
+
         logger.info("Backtest started from %s to %s", self.start_time, self.end_time)
         self.is_running = True
 
         while self.current_time < self.end_time:
-            # TODO: Implement the backtest logic here
             self.process_next_event()
-            self.current_time += 1  # Increment time for the sake of example
+
+            # Process new bids and asks
+            for exchange in self.exchanges.values():
+                exchange.match_orders()
+
+            # Jump to next event timestamp
+            self.current_time = self.timestamps.pop(0) if self.timestamps else self.end_time
         logger.info("Backtest completed")
-        self.evaluate_perf() # Evaluate Perf
+        logger.info("Evaluating performance metrics")
+        self.evaluate_perf()  # Evaluate Perf
+        logger.info("Backtest finished")
 
     # Evaluate performance metrics
     def evaluate_perf(self):
@@ -88,7 +110,7 @@ class BacktestEngine:
         # Perf metrics
         metrics = PerformanceMetrics(self.returns, self.pnl, self.trades)
 
-        cumulative_return = metrics.cumulative_returns()[-1] # get last data from the tab
+        cumulative_return = metrics.cumulative_returns()[-1]  # get last data from the tab
         win_rate = metrics.win_rate()
 
         cum_return_interp = interpret_cumulative_returns(cumulative_return)
