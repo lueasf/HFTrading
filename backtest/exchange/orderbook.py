@@ -61,6 +61,13 @@ class OrderBook:
 
         self.orders: Dict[str, Order] = {}
 
+    def export(self) -> dict:
+        return {
+            "symbol": self.symbol,
+            "bids": {price: level.volume for price, level in self.bids.items()},
+            "asks": {price: level.volume for price, level in self.asks.items()},
+        }
+
     def add_bid(self, order: Order):
         price = order.price
         volume = order.quantity
@@ -86,6 +93,8 @@ class OrderBook:
         volume = order.quantity
         if price in self.bids:
             self.bids[price].volume -= volume
+            if order.order_id in self.bids[price].orders:
+                del self.bids[price].orders[order.order_id]
             if self.bids[price].volume <= 0:
                 del self.bids[price]
 
@@ -145,14 +154,5 @@ class OrderBook:
                         del bid_orders[bid_order.order_id]
                     if ask_order.remaining_quantity == 0:
                         del ask_orders[ask_order.order_id]
-
-        # Update order book levels
-        for price, level in self.bids.items():
-            if level.volume <= 0:
-                del self.bids[price]
-
-        for price, level in self.asks.items():
-            if level.volume <= 0:
-                del self.asks[price]
 
         return matched_orders

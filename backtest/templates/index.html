@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+<head>
+    <title>Exchange State Monitor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .exchange-container {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .exchange-header {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 14px;
+        }
+        .balances, .order-books {
+            margin-top: 10px;
+        }
+        .order-book {
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .bids, .asks {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 20px;
+        }
+        .bids h4 {
+            color: green;
+        }
+        .asks h4 {
+            color: red;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: right;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Exchange State Monitor</h1>
+    <div id="exchanges-container"></div>
+
+    <script type="text/javascript" charset="utf-8">
+        var socket = io();
+        var exchangesData = {};
+        
+        // Receive messages on "exchange_state"
+        socket.on('exchange_state', function(msg) {
+            console.log("Received exchange state: ", msg);
+            
+            // Store or update the exchange data
+            exchangesData[msg.exchange] = msg;
+            
+            // Update the visualization
+            updateExchangesDisplay();
+        });
+        
+        function updateExchangesDisplay() {
+            const container = document.getElementById('exchanges-container');
+            container.innerHTML = '';
+            
+            // Loop through all exchanges we have data for
+            for (const exchangeName in exchangesData) {
+                const exchangeData = exchangesData[exchangeName];
+                const exchangeElement = createExchangeElement(exchangeData);
+                container.appendChild(exchangeElement);
+            }
+        }
+        
+        function createExchangeElement(data) {
+            const exchangeDiv = document.createElement('div');
+            exchangeDiv.className = 'exchange-container';
+            
+            // Format timestamp to local date and time
+            const timestamp = new Date(data.timestamp).toLocaleString();
+            
+            // Create exchange header
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'exchange-header';
+            headerDiv.innerHTML = `
+                <span>${data.name || data.exchange}</span>
+                <span class="timestamp">Last update: ${timestamp}</span>
+            `;
+            exchangeDiv.appendChild(headerDiv);
+            
+            // Check if order_books exists as parent structure
+            if (data.order_books) {
+                // Add fee rate info
+                const feeDiv = document.createElement('div');
+                feeDiv.innerHTML = `<strong>Fee Rate:</strong> ${data.order_books.fee_rate}`;
+                exchangeDiv.appendChild(feeDiv);
+                
+                // Add balances section
+                const balancesDiv = document.createElement('div');
+                balancesDiv.className = 'balances';
+                balancesDiv.innerHTML = '<h3>Balances</h3>';
+                
+                if (data.order_books.balances) {
+                    const balanceTable = document.createElement('table');
+                    balanceTable.innerHTML = `
+                        <tr>
+                            <th>Asset</th>
+                            <th>Amount</th>
+                        </tr>
+                    `;
+                    
+                    for (const asset in data.order_books.balances) {
+                        balanceTable.innerHTML += `
+                            <tr>
+                                <td>${asset}</td>
+                                <td>${data.order_books.balances[asset]}</td>
+                            </tr>
+                        `;
+                    }
+                    balancesDiv.appendChild(balanceTable);
+                } else {
+                    balancesDiv.innerHTML += '<p>No balance data available</p>';
+                }
+                exchangeDiv.appendChild(balancesDiv);
+                
+                // Add order books section
+                const orderBooksDiv = document.createElement('div');
+                orderBooksDiv.className = 'order-books';
+                orderBooksDiv.innerHTML = '<h3>Order Books</h3>';
+                
+                if (data.order_books.order_books) {
+                    for (const symbol in data.order_books.order_books) {
+                        const orderBook = data.order_books.order_books[symbol];
+                        const orderBookDiv = document.createElement('div');
+                        orderBookDiv.className = 'order-book';
+                        orderBookDiv.innerHTML = `<h4>Symbol: ${symbol}</h4>`;
+                        
+                        // Create bids section
+                        const bidsDiv = document.createElement('div');
+                        bidsDiv.className = 'bids';
+                        bidsDiv.innerHTML = '<h4>Bids</h4>';
+                        
+                        if (orderBook.bids && Object.keys(orderBook.bids).length > 0) {
+                            const bidsTable = document.createElement('table');
+                            bidsTable.innerHTML = `
+                                <tr>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            `;
+                            
+                            for (const price in orderBook.bids) {
+                                bidsTable.innerHTML += `
+                                    <tr>
+                                        <td>${price}</td>
+                                        <td>${orderBook.bids[price]}</td>
+                                    </tr>
+                                `;
+                            }
+                            bidsDiv.appendChild(bidsTable);
+                        } else {
+                            bidsDiv.innerHTML += '<p>No bids available</p>';
+                        }
+                        
+                        // Create asks section
+                        const asksDiv = document.createElement('div');
+                        asksDiv.className = 'asks';
+                        asksDiv.innerHTML = '<h4>Asks</h4>';
+                        
+                        if (orderBook.asks && Object.keys(orderBook.asks).length > 0) {
+                            const asksTable = document.createElement('table');
+                            asksTable.innerHTML = `
+                                <tr>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            `;
+                            
+                            for (const price in orderBook.asks) {
+                                asksTable.innerHTML += `
+                                    <tr>
+                                        <td>${price}</td>
+                                        <td>${orderBook.asks[price]}</td>
+                                    </tr>
+                                `;
+                            }
+                            asksDiv.appendChild(asksTable);
+                        } else {
+                            asksDiv.innerHTML += '<p>No asks available</p>';
+                        }
+                        
+                        orderBookDiv.appendChild(bidsDiv);
+                        orderBookDiv.appendChild(asksDiv);
+                        orderBooksDiv.appendChild(orderBookDiv);
+                    }
+                } else {
+                    orderBooksDiv.innerHTML += '<p>No order book data available</p>';
+                }
+                exchangeDiv.appendChild(orderBooksDiv);
+            } else {
+                exchangeDiv.innerHTML += '<p>No order book data available</p>';
+            }
+            
+            return exchangeDiv;
+        }
+    </script>
+</body>
+</html>

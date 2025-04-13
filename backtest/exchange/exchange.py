@@ -14,6 +14,14 @@ class Exchange:
 
         self.order_books: Dict[str, OrderBook] = {}
 
+    def export(self) -> dict:
+        return {
+            "name": self.name,
+            "fee_rate": self.fee_rate,
+            "balances": self.balances,
+            "order_books": {symbol: order_book.export() for symbol, order_book in self.order_books.items()}
+        }
+
     def add_order_book(self, symbol: str):
         if symbol not in self.order_books:
             self.order_books[symbol] = OrderBook(symbol)

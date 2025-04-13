@@ -15,11 +15,12 @@ logger = logging.getLogger(__name__)
 
 class BacktestEngine:
 
-    def __init__(self, start_time: float, end_time: float):
+    def __init__(self, start_time: float, end_time: float, socketio=None):
         self.start_time = start_time
         self.end_time = end_time
         self.current_time = start_time
         self.is_running = False
+        self.socketio = socketio
 
         self.returns = []
         self.pnl = []
@@ -93,6 +94,13 @@ class BacktestEngine:
             # Process new bids and asks
             for exchange in self.exchanges.values():
                 exchange.match_orders()
+
+                # TODO
+                self.socketio.emit('exchange_state', {
+                    'timestamp': self.current_time,
+                    'exchange': exchange.name,
+                    'order_books': exchange.export()
+                })
 
             # Jump to next event timestamp
             self.current_time = self.timestamps.pop(0) if self.timestamps else self.end_time
