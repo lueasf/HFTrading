@@ -1,5 +1,5 @@
 import unittest
-from backtest.exchange.orderbook import Order, OrderBook, Status
+from ..exchange.orderbook import Order, OrderBook, Status
 
 
 class TestOrder(unittest.TestCase):
