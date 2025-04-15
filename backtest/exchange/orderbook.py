@@ -137,7 +137,6 @@ class OrderBook:
         best_bid, bid_devel = self.get_best_bid()
         best_ask, ask_devel = self.get_best_ask()
 
-        print(best_bid, best_ask, bid_devel, ask_devel)
         if best_bid is not None and best_ask is not None and best_bid >= best_ask:
             bid_orders = bid_devel.orders.copy()
             ask_orders = ask_devel.orders.copy()
