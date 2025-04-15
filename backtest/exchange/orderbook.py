@@ -45,12 +45,18 @@ class Order:
             side="buy" if exchange_data.is_buyer_maker else "sell"
         )
 
+    def __repr__(self):
+        return f"Order(order_id={self.order_id}, exchange_name={self.exchange_name}, symbol={self.symbol}, price={self.price}, quantity={self.quantity}, filled_quantity={self.filled_quantity}, status={self.status}, side={self.side})"
+
 
 class OrderBookLevel:
     def __init__(self, price: float, volume: float):
         self.price = price
         self.volume = volume
         self.orders: Dict[str, Order] = {}
+
+    def __repr__(self):
+        return f"OrderBookLevel(price={self.price}, volume={self.volume}, orders={self.orders})"
 
 
 class OrderBook:
@@ -76,6 +82,7 @@ class OrderBook:
         else:
             self.bids[price].volume += volume
 
+        self.bids[price].orders[order.order_id] = order
         self.orders[order.order_id] = order
 
     def add_ask(self, order: Order):
@@ -86,6 +93,7 @@ class OrderBook:
         else:
             self.asks[price].volume += volume
 
+        self.asks[price].orders[order.order_id] = order
         self.orders[order.order_id] = order
 
     def remove_bid(self, order: Order):
@@ -117,7 +125,7 @@ class OrderBook:
             return max(self.bids.items(), key=lambda x: x[0])
         return None, None
 
-    def get_best_ask(self):
+    def get_best_ask(self) -> tuple[float, OrderBookLevel] | tuple[None, None]:
         if self.asks:
             return min(self.asks.items(), key=lambda x: x[0])
         return None, None
@@ -129,6 +137,7 @@ class OrderBook:
         best_bid, bid_devel = self.get_best_bid()
         best_ask, ask_devel = self.get_best_ask()
 
+        print(best_bid, best_ask, bid_devel, ask_devel)
         if best_bid is not None and best_ask is not None and best_bid >= best_ask:
             bid_orders = bid_devel.orders.copy()
             ask_orders = ask_devel.orders.copy()
