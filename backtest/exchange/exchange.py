@@ -59,7 +59,7 @@ class Exchange:
 
             matched_orders: Dict[str, Dict[str, float]] = order_book.match_orders()
 
-            for order_id, match_info in matched_orders:
+            for order_id, match_info in matched_orders.items():
                 order = order_book.orders[order_id]
 
                 previously_filled = order.filled_quantity
