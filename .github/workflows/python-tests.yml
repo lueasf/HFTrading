@@ -25,5 +25,6 @@ jobs:
 
       - name: Run backtest tests
         run: |
+          export PYTHONPATH=$(pwd)
           cd backtest
           python run_tests.py
