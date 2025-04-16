@@ -16,7 +16,7 @@ if __name__ == "__main__":
     """
     # Add the project root to path to ensure imports work
     sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-    
+
     if len(sys.argv) > 1:
         test_name = sys.argv[1]
         # If it's a file name without extension, add .py
@@ -24,11 +24,12 @@ if __name__ == "__main__":
             test_name = f'test_{test_name}.py'
         elif '.' not in test_name and test_name.startswith('test_'):
             test_name = f'{test_name}.py'
-        
+
         # Run with pytest for better output
         pytest.main([f'tests/{test_name}', '-v'])
     else:
         # Discover and run all tests
         test_suite = unittest.defaultTestLoader.discover('tests')
         test_runner = unittest.TextTestRunner(verbosity=2)
-        test_runner.run(test_suite)
+        result = test_runner.run(test_suite)
+        sys.exit(not result.wasSuccessful())
