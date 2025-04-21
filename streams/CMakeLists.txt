@@ -31,6 +31,7 @@ target_link_libraries(streams_lib PRIVATE Boost::asio
         GTest::gtest_main
         GTest::gtest
 
+        metrics_lib
         communication_lib
 )
 
