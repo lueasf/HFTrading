@@ -1,4 +1,6 @@
 # HFTrading
+[![Python Tests](https://github.com/lueasf/HFTrading/actions/workflows/python-tests.yml/badge.svg)](https://github.com/lueasf/HFTrading/actions/workflows/python-tests.yml)
+[![Build C++ Executable](https://github.com/lueasf/HFTrading/actions/workflows/build.yml/badge.svg)](https://github.com/lueasf/HFTrading/actions/workflows/build.yml)
 
 HFTrading is a group project about creating a High Frequency Trading Tool in C++ & Python.
 
