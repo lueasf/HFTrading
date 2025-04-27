@@ -1,10 +1,11 @@
 #define NATS_HAS_TLS
 
 #include "websocket_client.h"
-#include <fmt/core.h>
 #include <fmt/chrono.h>
 #include <iostream>
 #include <chrono>
+
+#include "stream_metrics.h"
 
 // connect to the Binance WebSocket API, receive trade data, and process orders.
 BinanceWebSocketClient::BinanceWebSocketClient(net::io_context& ioc, ssl::context& ctx, const Metrics &metrics)
@@ -170,7 +171,7 @@ void BinanceWebSocketClient::handle_trade_message(const json& j)
         {
             m_metrics.send_order(symbol, SELL);
         }
-        m_metrics.send_latency(symbol, latency);
+        mark_latency(symbol, latency);
 
         using namespace std::chrono;
         fmt::print("[{}] BTC/USDT {} | Price: {} | Quantity: {} | Latency: {} | Trade ID: {}\n",

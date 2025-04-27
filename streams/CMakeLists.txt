@@ -15,10 +15,15 @@ add_library(streams_lib
         metrics.cpp
         metrics.h
         config.cpp
+        stream_metrics.h
         config.h
 )
 
-target_include_directories(streams_lib PUBLIC ${BOOST_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(streams_lib PUBLIC
+        ${BOOST_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}
+)
 
 target_link_libraries(streams_lib PRIVATE Boost::asio
         Boost::beast
@@ -30,6 +35,8 @@ target_link_libraries(streams_lib PRIVATE Boost::asio
         yaml-cpp::yaml-cpp
         GTest::gtest_main
         GTest::gtest
+
+        $<IF:$<TARGET_EXISTS:hdr_histogram::hdr_histogram>,hdr_histogram::hdr_histogram,hdr_histogram::hdr_histogram_static>
 
         metrics_lib
         communication_lib

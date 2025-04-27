@@ -9,6 +9,8 @@
 #include <boost/asio/ssl/context.hpp>
 #include <argparse/argparse.hpp>
 
+#include "stream_metrics.h"
+
 int main(int argc, char* argv[])
 {
     using namespace std;
@@ -38,6 +40,8 @@ int main(int argc, char* argv[])
 
     NatsClient natsClient;
     natsClient.connect();
+
+    init_metrics();
 
     Metrics metrics(natsClient);
 
