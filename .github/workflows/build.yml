@@ -15,18 +15,16 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: debian:12
     steps:
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git curl zip unzip tar cmake pkg-config build-essential g++ gcc
-    
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl zip unzip tar cmake pkg-config build-essential g++ gcc
 
       - name: Clone vcpkg
         uses: actions/checkout@v4
