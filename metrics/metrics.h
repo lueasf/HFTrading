@@ -22,5 +22,5 @@ public:
 
     virtual ~Metric() = default;
 
-    [[nodiscard]] virtual std::string to_prometheus() = 0;
+    [[nodiscard]] virtual std::string_view to_prometheus() = 0;
 };

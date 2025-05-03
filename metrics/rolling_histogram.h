@@ -43,6 +43,7 @@ class RollingHistogram final : public Metric {
     std::mutex histograms_mtx;
     std::thread swap_thread;
     std::atomic<bool> running{false};
+    std::string prometheus_output;
     int swap_interval_ms = 5000;
 
     void swap_loop() {
@@ -52,7 +53,48 @@ class RollingHistogram final : public Metric {
             for (auto &[_, hist_pair]: histograms) {
                 hist_pair->swap_active_inactive();
             }
+            generate_prometheus_output();
         }
+    }
+
+    void generate_prometheus_output() {
+        std::ostringstream oss;
+        oss << "# HELP " << name << " " << help << "\n";
+        oss << "# TYPE " << name << " summary\n";
+
+        for (const auto &[key, hist_pair]: histograms) {
+            // Parse the key back into labels
+            std::map<std::string, std::string> labels;
+            std::istringstream key_stream(key);
+            std::string label_pair;
+            while (std::getline(key_stream, label_pair, ';')) {
+                if (label_pair.empty()) continue;
+                size_t pos = label_pair.find('=');
+                if (pos != std::string::npos) {
+                    labels[label_pair.substr(0, pos)] = label_pair.substr(pos + 1);
+                }
+            }
+
+            std::string base_labels = format_labels(labels);
+
+            for (const double p: {50.0, 90.0, 95.0, 99.0, 99.9}) {
+                oss << name;
+                if (base_labels.empty()) {
+                    oss << "{quantile=\"" << p / 100 << "\"}";
+                } else {
+                    oss << base_labels.substr(0, base_labels.length() - 1)
+                            << ",quantile=\"" << p / 100 << "\"}";
+                }
+                oss << " " << hdr_value_at_percentile(hist_pair->inactive, p) << "\n";
+            }
+
+            double sum = hdr_mean(hist_pair->inactive) * static_cast<double>(hist_pair->inactive->total_count);
+
+            oss << name << "_sum" << base_labels << " " << sum << "\n";
+            oss << name << "_count" << base_labels << " " << hist_pair->inactive->total_count << "\n";
+        }
+
+        prometheus_output = oss.str();
     }
 
     static std::string make_label_key(const std::map<std::string, std::string> &labels) {
@@ -96,45 +138,8 @@ public:
         hdr_record_value(hist_pair->active, value);
     }
 
-    std::string to_prometheus() override {
-        std::lock_guard lock(histograms_mtx);
-        std::ostringstream oss;
-        oss << "# HELP " << name << " " << help << "\n";
-        oss << "# TYPE " << name << " summary\n";
-
-        for (const auto &[key, hist_pair]: histograms) {
-            // Parse the key back into labels
-            std::map<std::string, std::string> labels;
-            std::istringstream key_stream(key);
-            std::string label_pair;
-            while (std::getline(key_stream, label_pair, ';')) {
-                if (label_pair.empty()) continue;
-                size_t pos = label_pair.find('=');
-                if (pos != std::string::npos) {
-                    labels[label_pair.substr(0, pos)] = label_pair.substr(pos + 1);
-                }
-            }
-
-            std::string base_labels = format_labels(labels);
-
-            for (const double p: {50.0, 90.0, 95.0, 99.0, 99.9}) {
-                oss << name;
-                if (base_labels.empty()) {
-                    oss << "{quantile=\"" << p / 100 << "\"}";
-                } else {
-                    oss << base_labels.substr(0, base_labels.length() - 1)
-                            << ",quantile=\"" << p / 100 << "\"}";
-                }
-                oss << " " << hdr_value_at_percentile(hist_pair->inactive, p) << "\n";
-            }
-
-            double sum = hdr_mean(hist_pair->inactive) * static_cast<double>(hist_pair->inactive->total_count);
-
-            oss << name << "_sum" << base_labels << " " << sum << "\n";
-            oss << name << "_count" << base_labels << " " << hist_pair->inactive->total_count << "\n";
-        }
-
-        return oss.str();
+    std::string_view to_prometheus() override {
+        return prometheus_output;
     }
 
     ~RollingHistogram() override {
