@@ -128,6 +128,9 @@ public:
                 oss << " " << hdr_value_at_percentile(hist_pair->inactive, p) << "\n";
             }
 
+            double sum = hdr_mean(hist_pair->inactive) * static_cast<double>(hist_pair->inactive->total_count);
+
+            oss << name << base_labels << "_sum " << sum << "\n";
             oss << name << base_labels << "_count " << hist_pair->inactive->total_count << "\n";
         }
 
