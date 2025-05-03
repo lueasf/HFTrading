@@ -130,8 +130,8 @@ public:
 
             double sum = hdr_mean(hist_pair->inactive) * static_cast<double>(hist_pair->inactive->total_count);
 
-            oss << name << base_labels << "_sum " << sum << "\n";
-            oss << name << base_labels << "_count " << hist_pair->inactive->total_count << "\n";
+            oss << name << "_sum" << base_labels << " " << sum << "\n";
+            oss << name << "_count" << base_labels << " " << hist_pair->inactive->total_count << "\n";
         }
 
         return oss.str();
