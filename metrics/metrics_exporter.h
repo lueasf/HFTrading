@@ -12,7 +12,7 @@ class metrics_exporter {
 public:
     void start(int port = 8080) {
         running = true;
-        server_thread = std::thread([this, port]() {
+        server_thread = std::thread([port]() {
             httplib::Server svr;
 
             svr.Get("/metrics", [](const httplib::Request &, httplib::Response &res) {

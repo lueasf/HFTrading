@@ -77,7 +77,7 @@ class RollingHistogram final : public Metric {
 
             std::string base_labels = format_labels(labels);
 
-            for (const double p: {50.0, 90.0, 95.0, 99.0, 99.9}) {
+            for (const double p: {50.0, 90.0, 95.0, 99.0}) {
                 oss << name;
                 if (base_labels.empty()) {
                     oss << "{quantile=\"" << p / 100 << "\"}";
