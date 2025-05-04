@@ -1,3 +1,5 @@
+#pragma once
+
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -14,37 +16,42 @@ namespace http = beast::http;
 namespace websocket = beast::websocket;
 namespace net = boost::asio;
 namespace ssl = boost::asio::ssl;
+
 using tcp = boost::asio::ip::tcp;
 using json = nlohmann::json;
 
-class BinanceWebSocketClient {
+class WebSocketClient {
 public:
-    BinanceWebSocketClient(net::io_context &ioc, ssl::context &ctx, const Metrics &metrics);
+    explicit WebSocketClient(std::string name, std::string host, std::string port, net::io_context &ioc,
+                             ssl::context &ctx, const Metrics &metrics)
+        : m_metrics(metrics), name(std::move(name)), host(std::move(host)), port(std::move(port)), m_ioc(ioc),
+          m_ctx(ctx), m_connected(false) {
+    }
 
-    ~BinanceWebSocketClient();
+    virtual ~WebSocketClient() = default;
 
-    void connect(const std::string &target);
+    virtual void connect(const std::string &target) = 0;
 
-    void disconnect();
+    virtual void disconnect() = 0;
 
-    void start_reading();
+    virtual void start_reading() = 0;
 
-    bool is_connected() const;
+    [[nodiscard]] virtual bool is_connected() const = 0;
 
-private:
+protected:
     void on_message(beast::flat_buffer &buffer);
 
     void handle_trade_message(const json &j);
 
-    void read_next();
+    virtual void read_next() = 0;
 
     Metrics m_metrics;
+    std::string name;
     std::string host;
     std::string port;
     net::io_context &m_ioc;
     ssl::context &m_ctx;
-    std::unique_ptr<websocket::stream<beast::ssl_stream<tcp::socket>>> m_ws;
+    std::unique_ptr<websocket::stream<beast::ssl_stream<tcp::socket> > > m_ws;
     beast::flat_buffer m_buffer;
     bool m_connected;
 };
-

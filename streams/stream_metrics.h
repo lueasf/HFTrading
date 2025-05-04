@@ -15,6 +15,6 @@ inline void init_metrics() {
     exporter.start();
 }
 
-inline void mark_latency(const std::string &symbol, const long long latency) {
-    latency_metric.get()->record(latency, {{"symbol", symbol}});
+inline void mark_latency(const std::string &exchange, const std::string &symbol, const long long latency) {
+    latency_metric->record(latency, {{"exchange", exchange}, {"symbol", symbol}});
 }

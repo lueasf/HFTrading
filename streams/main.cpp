@@ -2,13 +2,13 @@
 
 #include <config.h>
 #include <iostream>
-#include "websocket_client.h"
 #include "nats_client.h"
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/ssl/context.hpp>
 #include <argparse/argparse.hpp>
 
+#include "binance_websocket_client.h"
 #include "stream_metrics.h"
 
 int main(int argc, char* argv[])
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
         ctx.set_default_verify_paths();
 
         // Create our WebSocket client
-        BinanceWebSocketClient client(ioc, ctx, metrics);
+        auto client = BinanceWebSocketClient(ioc, ctx, metrics);
 
         // Set up signal handling
         net::signal_set signals(ioc, SIGINT, SIGTERM);
