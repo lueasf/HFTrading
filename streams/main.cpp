@@ -2,7 +2,7 @@
 
 #include <config.h>
 #include <iostream>
-#include "nats_client.h"
+#include "../communication/nats/nats_client.h"
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/ssl/context.hpp>

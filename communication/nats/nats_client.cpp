@@ -3,15 +3,15 @@
 // https://github.com/nats-io/nats.c
 // connect to nats and publish trade events.
 NatsClient::NatsClient() {
-    m_nc = NULL;
-    m_sub = NULL;
-    m_msg = NULL;
+    m_nc = nullptr;
+    m_sub = nullptr;
+    m_msg = nullptr;
 }
 
 NatsClient::~NatsClient() {
-    if (m_nc != NULL) {
+    if (m_nc != nullptr) {
         natsConnection_Destroy(m_nc);
-        m_nc = NULL;
+        m_nc = nullptr;
     }
 }
 
@@ -24,10 +24,6 @@ int NatsClient::connect() {
     return 0;
 }
 
-void NatsClient::publish_raw(std::string value) const {
-    natsConnection_PublishString(m_nc, "foo", value.c_str());
-}
-
-void NatsClient::publish(const metric_message &message) const {
-    natsConnection_PublishString(m_nc, message.name.c_str(), to_nats_message(message).c_str());
+void NatsClient::publish_raw(const std::string subject, const std::string value) const {
+    natsConnection_PublishString(m_nc, subject.c_str(), value.c_str());
 }

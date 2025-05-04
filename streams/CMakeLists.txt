@@ -10,8 +10,6 @@ FetchContent_MakeAvailable(googletest)
 add_library(streams_lib
         websocket_client.h
         binance_websocket_client.h
-        nats_client.cpp
-        nats_client.h
         metrics.cpp
         metrics.h
         config.cpp

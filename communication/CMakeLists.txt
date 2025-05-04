@@ -12,8 +12,10 @@ FetchContent_MakeAvailable(googletest)
 ### Communication Library ####
 
 add_library(communication_lib
-        aeron_publisher.cpp
-        aeron_publisher.h
+        aeron/aeron_publisher.cpp
+        aeron/aeron_publisher.h
+        nats/nats_client.cpp
+        nats/nats_client.h
 )
 
 target_include_directories(communication_lib PUBLIC ${BOOST_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
