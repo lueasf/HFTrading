@@ -35,6 +35,16 @@ class Exchange:
 
         return self.order_books.get(symbol)
 
+    def submit_internal_order(self, order: Order, callback: callable):
+        order_book = self.get_order_book(order.symbol)
+        if order_book:
+            order.callback = callback
+            if order.side == "buy":
+                order_book.add_bid(order)
+            else:
+                order_book.add_ask(order)
+            logger.debug(f"Internal order {order} submitted to exchange {self.name}.")
+
     def submit_order(self, order: Order):
         order_book = self.get_order_book(order.symbol)
         if order_book:
@@ -73,5 +83,7 @@ class Exchange:
                     order_book.remove_bid(order) if order.side == "buy" else order_book.remove_ask(order)
                 else:
                     order.status = Status.PARTIALLY_FILLED
+
+                order.callback(order, match_info)
 
                 logger.debug(f"Order {order_id} matched with filled quantity {order.filled_quantity}.")

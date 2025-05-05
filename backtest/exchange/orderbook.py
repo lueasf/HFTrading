@@ -27,6 +27,7 @@ class Order:
     filled_quantity: float
     status: Status
     side: str
+    callback: callable = lambda x: None
 
     @property
     def remaining_quantity(self):
