@@ -7,8 +7,8 @@ class StaticArbitrageStrategy(Strategy):
         super().__init__(data_feed_1, exchange_1)
         self.data_feed1 = data_feed_1
         self.data_feed2 = data_feed2
-        self.exchange1 = exchange_1
-        self.exchange2 = exchange_2
+        self.exchange_1 = exchange_1
+        self.exchange_2 = exchange_2
         self.threshold = threshold
         self.spread = spread
 
@@ -21,9 +21,8 @@ class StaticArbitrageStrategy(Strategy):
             buy_order = Order(
                 order_id="buy_order_1",
                 exchange_name=self.exchange_1.name,
-                symbol=self.data_feed_1.symbol,
+                symbol=self.data_feed1.symbol,
                 price=price_1,
-                quantity=self.order_size,
                 filled_quantity=0.0,
                 status=Status.PENDING,
                 side="buy"
@@ -32,9 +31,8 @@ class StaticArbitrageStrategy(Strategy):
             sell_order = Order(
                 order_id="sell_order_1",
                 exchange_name=self.exchange_2.name,
-                symbol=self.data_feed_2.symbol,
+                symbol=self.data_feed2.symbol,
                 price=price_2,
-                quantity=self.order_size,
                 filled_quantity=0.0,
                 status=Status.PENDING,
                 side="sell"
@@ -48,9 +46,8 @@ class StaticArbitrageStrategy(Strategy):
             buy_order = Order(
                 order_id="buy_order_2",
                 exchange_name=self.exchange_2.name,
-                symbol=self.data_feed_2.symbol,
+                symbol=self.data_feed2.symbol,
                 price=price_2,
-                quantity=self.order_size,
                 filled_quantity=0.0,
                 status=Status.PENDING,
                 side="buy"
@@ -59,9 +56,8 @@ class StaticArbitrageStrategy(Strategy):
             sell_order = Order(
                 order_id="sell_order_2",
                 exchange_name=self.exchange_1.name,
-                symbol=self.data_feed_1.symbol,
+                symbol=self.data_feed1.symbol,
                 price=price_1,
-                quantity=self.order_size,
                 filled_quantity=0.0,
                 status=Status.PENDING,
                 side="sell"
