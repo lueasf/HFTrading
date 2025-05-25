@@ -1,0 +1,9 @@
+services:
+  streams:
+    build:
+      context: .
+      dockerfile: Streams.Dockerfile
+  aeron-media:
+    build:
+      context: .
+      dockerfile: AeronMedia.Dockerfile
