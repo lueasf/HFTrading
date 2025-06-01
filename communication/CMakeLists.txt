@@ -12,10 +12,11 @@ FetchContent_MakeAvailable(googletest)
 ### Communication Library ####
 
 add_library(communication_lib
-        aeron/aeron_publisher.cpp
-        aeron/aeron_publisher.h
         nats/nats_client.cpp
         nats/nats_client.h
+        aeron/aeron.h
+        aeron/publisher.h
+        aeron/subscriber.h
 )
 
 target_include_directories(communication_lib PUBLIC ${BOOST_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
@@ -25,12 +26,17 @@ add_dependencies(communication_lib aeron)
 
 ### Tests ####
 
-add_executable(communication_tests tests/EmbeddedAeronMediaDriver.h tests/main_test.cpp)
+add_executable(communication_tests
+        tests/EmbeddedAeronMediaDriver.h
+        tests/main_test.cpp
+)
 
 target_link_libraries(communication_tests PRIVATE
         communication_lib
         GTest::gtest_main
         GTest::gtest
+        GTest::gmock
 )
 
 include(GoogleTest)
+
