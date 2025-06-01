@@ -23,7 +23,7 @@ public:
             std::cerr << "Publication is not connected." << std::endl;
             return -1;
         }
-        return aeronConnection->publish(publication, message);
+        return AeronConnection::publish(publication, message);
     }
 
 private:

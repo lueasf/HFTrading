@@ -23,7 +23,7 @@ public:
             std::cerr << "Subscription is not connected." << std::endl;
             return -1;
         }
-        aeronConnection->subscribe(subscription, handler);
+        AeronConnection::subscribe(subscription, handler);
         return 0;
     }
 
