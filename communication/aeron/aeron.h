@@ -3,9 +3,7 @@
 #include <Context.h>
 
 class AeronConnection {
-    aeron::Context context;
-    std::shared_ptr<aeron::Aeron> aeron;
-
+public:
     int connect() {
         if (aeron && !aeron->isClosed()) {
             std::cerr << "Already connected to Aeron." << std::endl;
@@ -24,7 +22,8 @@ class AeronConnection {
         return aeron && !aeron->isClosed();
     }
 
-    std::shared_ptr<aeron::Publication> addPublication(const std::string &channel, const int32_t streamId) const {
+    std::shared_ptr<aeron::Publication>
+    addPublication(const std::string &channel, const int32_t streamId = 10001) const {
         if (!isConnected()) {
             std::cerr << "Not connected to Aeron." << std::endl;
             return nullptr;
@@ -63,7 +62,8 @@ class AeronConnection {
         return publication->offer(messageBuffer);
     }
 
-    std::shared_ptr<aeron::Subscription> addSubscription(const std::string &channel, const int32_t streamId) const {
+    std::shared_ptr<aeron::Subscription> addSubscription(const std::string &channel,
+                                                         const int32_t streamId = 10001) const {
         if (!isConnected()) {
             std::cerr << "Not connected to Aeron." << std::endl;
             return nullptr;
@@ -103,4 +103,8 @@ class AeronConnection {
         while (subscription->poll(fragmentHandler, 1) == 0) {
         }
     }
+
+private:
+    aeron::Context context;
+    std::shared_ptr<aeron::Aeron> aeron;
 };
