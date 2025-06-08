@@ -29,6 +29,7 @@ add_dependencies(communication_lib aeron)
 add_executable(communication_tests
         tests/EmbeddedAeronMediaDriver.h
         tests/main_test.cpp
+        tests/aeron_e2e_test.cpp
 )
 
 target_link_libraries(communication_tests PRIVATE

@@ -5,6 +5,13 @@
 
 class AeronPublisher {
 public:
+    explicit AeronPublisher(std::shared_ptr<AeronConnection> connection)
+        : aeronConnection(std::move(connection)) {
+        if (!aeronConnection || !aeronConnection->isConnected()) {
+            std::cerr << "Aeron connection is not established." << std::endl;
+        }
+    }
+
     int publish(const std::string &channel, std::string &message) {
         if (!aeronConnection || !aeronConnection->isConnected()) {
             std::cerr << "Aeron connection is not established." << std::endl;
@@ -19,10 +26,10 @@ public:
             }
             publications[channel] = publication;
         }
-        if (!publication->isConnected()) {
+        /*if (!publication->isConnected()) {
             std::cerr << "Publication is not connected." << std::endl;
             return -1;
-        }
+        }*/
         return AeronConnection::publish(publication, message);
     }
 

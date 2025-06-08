@@ -5,6 +5,13 @@
 
 class AeronSubscriber {
 public:
+    explicit AeronSubscriber(std::shared_ptr<AeronConnection> connection)
+        : aeronConnection(std::move(connection)) {
+        if (!aeronConnection || !aeronConnection->isConnected()) {
+            std::cerr << "Aeron connection is not established." << std::endl;
+        }
+    }
+
     int subscribe(const std::string &channel, const std::function<void(const std::string &)> &handler) {
         if (!aeronConnection || !aeronConnection->isConnected()) {
             std::cerr << "Aeron connection is not established." << std::endl;
@@ -19,10 +26,10 @@ public:
             }
             subscriptions[channel] = subscription;
         }
-        if (!subscription->isConnected()) {
+        /*if (!subscription->isConnected()) {
             std::cerr << "Subscription is not connected." << std::endl;
             return -1;
-        }
+        }*/
         AeronConnection::subscribe(subscription, handler);
         return 0;
     }

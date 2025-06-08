@@ -51,8 +51,8 @@ public:
 
     static int publish(const std::shared_ptr<aeron::Publication> &publication, std::string &message) {
         if (!publication || !publication->isConnected()) {
-            std::cerr << "Publication is not connected." << std::endl;
-            return -1;
+            std::cerr << "Publication is not yet connected." << std::endl;
+            //return -1;
         }
         const size_t messageSize = message.size();
 
@@ -92,8 +92,8 @@ public:
     static void subscribe(const std::shared_ptr<aeron::Subscription> &subscription,
                           std::function<void(const std::string &)> handler) {
         if (!subscription || !subscription->isConnected()) {
-            std::cerr << "Subscription is not connected." << std::endl;
-            return;
+            std::cerr << "Subscription is not yet connected." << std::endl;
+            //return;
         }
         auto fragmentHandler = [handler](const aeron::AtomicBuffer &buf, const aeron::util::index_t offset,
                                          const aeron::util::index_t length, const aeron::Header &header) {
