@@ -100,11 +100,18 @@ public:
             const std::string receivedMessage(reinterpret_cast<const char *>(buf.buffer() + offset), length);
             handler(receivedMessage);
         };
-        while (subscription->poll(fragmentHandler, 1) == 0) {
-        }
+        std::thread subscriptionThread(poll, subscription, fragmentHandler);
+        subscriptionThread.detach();
     }
 
 private:
     aeron::Context context;
     std::shared_ptr<aeron::Aeron> aeron;
+
+    static void poll(const std::shared_ptr<aeron::Subscription> &subscription,
+                          std::function<void(const aeron::AtomicBuffer &, const aeron::util::index_t,
+                                             const aeron::util::index_t, const aeron::Header &)> handler) {
+        while (subscription->poll(handler, 1) == 0) {
+        }
+    }
 };
